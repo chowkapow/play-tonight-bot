@@ -1,11 +1,13 @@
 import discord
 import os
+import sys
 
 from discord.ext import commands
 from dotenv import load_dotenv
 
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+env = "prod" if len(sys.argv) == 1 else "dev"
+TOKEN = os.getenv("DISCORD_TOKEN") if env == "prod" else os.getenv("dev_DISCORD_TOKEN")
 
 bot = commands.Bot(command_prefix="!")
 
