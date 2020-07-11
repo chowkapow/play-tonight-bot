@@ -20,39 +20,43 @@ async def help(ctx):
 Schedule time to play league!
 Want to contribute? Github
     **!help**
-        List Commands
-    **!faq**
-        Setup and learn how to use this bot
+        List commands
     **!create**
-        Start a list/team and specify time using !create n 00:00
-        Time is based on 24 hour format i.e. 20:00 is 8pm
+        Create a team with __!create__ or __!create time__
+        Default start time is 7pm
+        __!create 8pm__ will create a team with start time 8pm
+        Max of 5 teams can be created
     **!teams**
-        Shows current team list
+        Show current teams
     **!join**
-        Join team with !join n
+        Join team with __!join n__
     **!leave**
-        Leave team with !leave n
-    **!edittime**
-        Edit time to play with !edittime n 00:00"""
+        Leave team with __!leave n__
+    **!edit**
+        Edit time to play with __!edit n time__
+        __!edit 2 9pm__ will change Team 2's start time to 9pm
+        You must be part of the team to edit the time
+        """
     )
 
 
 @bot.command()
-async def create(ctx):
+async def create(ctx, time="7pm"):
     server_id = str(ctx.message.guild.id)
     data = read_json("teams.json")
     if server_id in data:
         server_teams = data.get(server_id)
-        id = (
-            int(server_teams[len(server_teams) - 1].get("id")) + 1
-            if len(server_teams) > 0
-            else 1
-        )
-        new_team = {"id": id, "time": "7 PM", "players": [ctx.author.name]}
-        server_teams.append(new_team)
+        count = len(server_teams)
+        if count == 5:
+            await ctx.send("Max of 5 teams reached! Please try again later.")
+            return
+        else:
+            id = int(server_teams[count - 1].get("id")) + 1 if count > 0 else 1
+            new_team = {"id": id, "time": time, "players": [ctx.author.name]}
+            server_teams.append(new_team)
     else:
         id = 1
-        data[server_id] = [{"id": 1, "time": "7 PM", "players": [ctx.author.name]}]
+        data[server_id] = [{"id": 1, "time": time, "players": [ctx.author.name]}]
 
     write_json(data)
     await ctx.send("Created team {}".format(id))
@@ -76,6 +80,30 @@ async def teams(ctx):
             )
             list_of_teams += "\n"
         await ctx.send(list_of_teams)
+    else:
+        await ctx.send("No teams exist!")
+
+
+@bot.command()
+async def edit(ctx, id, time):
+    server_id = str(ctx.message.guild.id)
+    data = read_json("teams.json")
+    if server_id in data:
+        server_teams = data.get(server_id)
+        i = 0
+        while i < len(server_teams):
+            team = server_teams[i]
+            if int(team.get("id")) == int(id):
+                if ctx.author.name not in team.get("players"):
+                    await ctx.send("You are not part of this team!")
+                    return
+                team.update({"time": time})
+                write_json(data)
+                await ctx.send("Team {}'s start time changed to {}".format(id, time))
+                await teams(ctx)
+                return
+            i += 1
+        await ctx.send("Team {} does not exist!".format(id))
     else:
         await ctx.send("No teams exist!")
 
