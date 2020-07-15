@@ -83,6 +83,38 @@ async def teams(ctx):
     else:
         await ctx.send("No teams exist!")
 
+@bot.command()
+async def join(ctx, id):
+    server_id = str(ctx.message.guild.id) #this is the name of the array
+    data = read_json("teams.json")
+    team_input = id
+    if server_id in data and len(data[server_id]) > 0:
+        for t in data[server_id]:
+            if str(t.get("id")) == team_input:
+                t.get("players").append(ctx.author.name)
+                write_json(data)
+                await teams(ctx)
+            else:
+                await ctx.send("Team not found")
+    else:
+       await ctx.send("Team does not exist!")
+
+@bot.command()
+async def leave(ctx, id):
+    server_id = str(ctx.message.guild.id) #this is the name of the array
+    data = read_json("teams.json")
+    team_input = id
+    if server_id in data and len(data[server_id]) > 0:
+        for t in data[server_id]:
+            if str(t.get("id")) == team_input and ctx.author.name in t.get("players"):
+                t.get("players").remove(ctx.author.name)
+                await ctx.send(t.get("players"))
+                await ctx.send("You have been removed from the team")
+                write_json(data)
+            else:
+                await ctx.send("You are not found in the specified team")
+    else:
+       await ctx.send("Team does not exist!")
 
 @bot.command()
 async def edit(ctx, id, time):
