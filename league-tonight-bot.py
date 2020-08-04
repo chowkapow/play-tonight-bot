@@ -2,7 +2,8 @@ import discord
 import os
 import sys
 
-from discord.ext import commands
+from datetime import datetime, timedelta
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 from utils import read_json, write_json
 
@@ -83,9 +84,10 @@ async def teams(ctx):
     else:
         await ctx.send("No teams exist!")
 
+
 @bot.command()
 async def join(ctx, id):
-    server_id = str(ctx.message.guild.id) #this is the name of the array
+    server_id = str(ctx.message.guild.id)  # this is the name of the array
     data = read_json("teams.json")
     team_input = id
     if server_id in data and len(data[server_id]) > 0:
@@ -97,11 +99,12 @@ async def join(ctx, id):
             else:
                 await ctx.send("Team not found")
     else:
-       await ctx.send("Team does not exist!")
+        await ctx.send("Team does not exist!")
+
 
 @bot.command()
 async def leave(ctx, id):
-    server_id = str(ctx.message.guild.id) #this is the name of the array
+    server_id = str(ctx.message.guild.id)  # this is the name of the array
     data = read_json("teams.json")
     team_input = id
     if server_id in data and len(data[server_id]) > 0:
@@ -114,7 +117,8 @@ async def leave(ctx, id):
             else:
                 await ctx.send("You are not found in the specified team")
     else:
-       await ctx.send("Team does not exist!")
+        await ctx.send("Team does not exist!")
+
 
 @bot.command()
 async def edit(ctx, id, time):
@@ -139,5 +143,33 @@ async def edit(ctx, id, time):
     else:
         await ctx.send("No teams exist!")
 
+
+@tasks.loop(hours=24)
+async def reset_teams():
+    write_json({})
+
+
+@reset_teams.before_loop
+async def before():
+    d = datetime.now()
+    if d.hour < 3:
+        reset = datetime(
+            year=d.year, month=d.month, day=d.day, hour=3, minute=0, second=0
+        )
+    else:
+        tomorrow = d + timedelta(days=1)
+        reset = datetime(
+            year=tomorrow.year,
+            month=tomorrow.month,
+            day=tomorrow.day,
+            hour=3,
+            minute=0,
+            second=0,
+        )
+    await asyncio.sleep((reset - d).total_seconds())
+    await bot.wait_until_ready()
+
+
+reset_teams.start()
 
 bot.run(TOKEN)
