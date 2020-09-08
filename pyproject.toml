@@ -2,7 +2,7 @@
 name = "league-tonight-bot"
 version = "0.1.0"
 description = "Discord bot for LoL team formation"
-authors = ["Eric Chow <eric.zjp.chow@gmail.com>", "Richard Kao", "Derek Ngo"]
+authors = ["Eric Chow <eric.zjp.chow@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
