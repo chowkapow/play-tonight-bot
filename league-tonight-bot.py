@@ -92,11 +92,17 @@ async def join(ctx, id):
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:
+                if ctx.author.name in t.get("players"):
+                    await ctx.send("You are already part of this team!")
+                    return
+                if len(t.get("players")) >= 5:
+                    await ctx.send("Team is full!")
+                    return
                 t.get("players").append(ctx.author.name)
                 write_json(data)
                 await teams(ctx)
-            else:
-                await ctx.send("Team not found!")
+                return
+        await ctx.send("Team not found!")
     else:
         await ctx.send("No teams exist!")
 
@@ -107,13 +113,18 @@ async def leave(ctx, id):
     data = read_json("teams.json")
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
-            if str(t.get("id")) == id and ctx.author.name in t.get("players"):
-                t.get("players").remove(ctx.author.name)
-                await ctx.send("You have been removed from team {}.".format(id))
-                await teams(ctx)
-                write_json(data)
-            else:
-                await ctx.send("You are not found in the specified team!")
+            if str(t.get("id")) == id:
+                if ctx.author.name not in t.get("players"):
+                    await ctx.send("You are not part of team {}!".format(id))
+                else:
+                    t.get("players").remove(ctx.author.name)
+                    if len(t.get("players")) == 0:
+                        data[server_id].remove(t)
+                    write_json(data)
+                    await ctx.send("You have been removed from team {}.".format(id))
+                    await teams(ctx)
+                return
+        await ctx.send("Team not found!")
     else:
         await ctx.send("No teams exist!")
 
@@ -122,22 +133,18 @@ async def leave(ctx, id):
 async def edit(ctx, id, time):
     server_id = str(ctx.message.guild.id)
     data = read_json("teams.json")
-    if server_id in data:
-        server_teams = data.get(server_id)
-        i = 0
-        while i < len(server_teams):
-            team = server_teams[i]
-            if int(team.get("id")) == int(id):
-                if ctx.author.name not in team.get("players"):
+    if server_id in data and len(data[server_id]) > 0:
+        for t in data[server_id]:
+            if str(t.get("id")) == id:
+                if ctx.author.name not in t.get("players"):
                     await ctx.send("You are not part of this team!")
                     return
-                team.update({"time": time})
+                t.update({"time": time})
                 write_json(data)
                 await ctx.send("Team {}'s start time changed to {}".format(id, time))
                 await teams(ctx)
                 return
-            i += 1
-        await ctx.send("Team {} does not exist!".format(id))
+        await ctx.send("Team not found!")
     else:
         await ctx.send("No teams exist!")
 
