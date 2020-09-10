@@ -1,3 +1,4 @@
+import asyncio
 import discord
 import os
 import sys
@@ -5,6 +6,8 @@ import sys
 from datetime import datetime, timedelta
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
+
+from constants import error_messages as em, help_command as hc
 from utils import read_json, write_json
 
 load_dotenv()
@@ -16,29 +19,26 @@ bot = commands.Bot(command_prefix="!", help_command=None)
 
 @bot.command()
 async def help(ctx):
-    await ctx.send(
-        """Help Menu
-Schedule time to play league!
-Want to contribute? Github
-    **!help**
-        List commands
-    **!create**
-        Create a team with __!create__ or __!create time__
-        Default start time is 7pm
-        __!create 8pm__ will create a team with start time 8pm
-        Max of 5 teams can be created
-    **!teams**
-        Show current teams
-    **!join**
-        Join team with __!join n__
-    **!leave**
-        Leave team with __!leave n__
-    **!edit**
-        Edit time to play with __!edit n time__
-        __!edit 2 9pm__ will change Team 2's start time to 9pm
-        You must be part of the team to edit the time
-        """
+    embed = discord.Embed(
+        title=hc.get("title"),
+        description=hc.get("description"),
+        color=discord.Colour.dark_blue(),
     )
+    embed.add_field(name=hc.get("help_name"), value=hc.get("help_value"), inline=False)
+    embed.add_field(name=hc.get("faq_name"), value=hc.get("faq_value"), inline=False)
+    embed.add_field(
+        name=hc.get("create_name"), value=hc.get("create_value"), inline=False
+    )
+    embed.add_field(
+        name=hc.get("teams_name"), value=hc.get("teams_value"), inline=False
+    )
+    embed.add_field(name=hc.get("join_name"), value=hc.get("join_value"), inline=False)
+    embed.add_field(
+        name=hc.get("leave_name"), value=hc.get("leave_value"), inline=False
+    )
+    embed.add_field(name=hc.get("edit_name"), value=hc.get("edit_value"), inline=False)
+    embed.set_footer(text=hc.get("footer"))
+    await ctx.send(embed=embed)
 
 
 @bot.command()
@@ -49,7 +49,7 @@ async def create(ctx, time="7pm"):
         server_teams = data.get(server_id)
         count = len(server_teams)
         if count == 5:
-            await ctx.send("Max of 5 teams reached! Please try again later.")
+            await ctx.send(em.get("max_teams"))
             return
         else:
             id = int(server_teams[count - 1].get("id")) + 1 if count > 0 else 1
@@ -69,20 +69,21 @@ async def teams(ctx):
     server_id = str(ctx.message.guild.id)
     data = read_json("teams.json")
     if server_id in data and len(data[server_id]) > 0:
-        list_of_teams = "**TEAMS**\n"
+        embed = discord.Embed(title="Teams", color=discord.Colour.dark_blue())
         for t in data[server_id]:
             i = 1
             players = "\n"
             for p in t.get("players"):
-                players += "\t{}. {}\n".format(i, p)
+                players += "{}. {}\n".format(i, p)
                 i += 1
-            list_of_teams += "**Team {}**\n**Time**: {}\n**Players** {}".format(
-                t.get("id"), t.get("time"), players
+            embed.add_field(
+                name="Team " + str(t.get("id")),
+                value="Time: " + t.get("time") + players + "--------------------",
+                inline=False,
             )
-            list_of_teams += "\n"
-        await ctx.send(list_of_teams)
+        await ctx.send(embed=embed)
     else:
-        await ctx.send("No teams exist!")
+        await ctx.send(em.get("no_teams"))
 
 
 @bot.command()
@@ -93,18 +94,18 @@ async def join(ctx, id):
         for t in data[server_id]:
             if str(t.get("id")) == id:
                 if ctx.author.name in t.get("players"):
-                    await ctx.send("You are already part of this team!")
+                    await ctx.send(em.get("join_already"))
                     return
                 if len(t.get("players")) >= 5:
-                    await ctx.send("Team is full!")
+                    await ctx.send(em.get("full"))
                     return
                 t.get("players").append(ctx.author.name)
                 write_json(data)
                 await teams(ctx)
                 return
-        await ctx.send("Team not found!")
+        await ctx.send(em.get("not_found"))
     else:
-        await ctx.send("No teams exist!")
+        await ctx.send(em.get("no_teams"))
 
 
 @bot.command()
@@ -115,7 +116,7 @@ async def leave(ctx, id):
         for t in data[server_id]:
             if str(t.get("id")) == id:
                 if ctx.author.name not in t.get("players"):
-                    await ctx.send("You are not part of team {}!".format(id))
+                    await ctx.send(em.get("not_part"))
                 else:
                     t.get("players").remove(ctx.author.name)
                     if len(t.get("players")) == 0:
@@ -124,9 +125,9 @@ async def leave(ctx, id):
                     await ctx.send("You have been removed from team {}.".format(id))
                     await teams(ctx)
                 return
-        await ctx.send("Team not found!")
+        await ctx.send(em.get("not_found"))
     else:
-        await ctx.send("No teams exist!")
+        await ctx.send(em.get("no_teams"))
 
 
 @bot.command()
@@ -137,16 +138,16 @@ async def edit(ctx, id, time):
         for t in data[server_id]:
             if str(t.get("id")) == id:
                 if ctx.author.name not in t.get("players"):
-                    await ctx.send("You are not part of this team!")
+                    await ctx.send(em.get("not_part"))
                     return
                 t.update({"time": time})
                 write_json(data)
                 await ctx.send("Team {}'s start time changed to {}".format(id, time))
                 await teams(ctx)
                 return
-        await ctx.send("Team not found!")
+        await ctx.send(em.get("not_found"))
     else:
-        await ctx.send("No teams exist!")
+        await ctx.send(em.get("no_teams"))
 
 
 @tasks.loop(hours=24)
