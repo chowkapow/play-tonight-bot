@@ -46,9 +46,19 @@ async def help(ctx):
 
 
 @bot.command()
-async def create(ctx, time):
+async def create(ctx, time, *args):
     server_id = str(ctx.message.guild.id)
     data = read_json("teams.json")
+    if len(args) != len(set(args)):
+        await ctx.send(em.get("duplicates"))
+        return
+    elif len(args) >= 5:
+        await ctx.send(em.get("too_many"))
+        return
+    players = [ctx.author.name]
+    if len(args) > 0:
+        for p in args:
+            players.append(p)
     if server_id in data:
         server_teams = data.get(server_id)
         count = len(server_teams)
@@ -57,11 +67,11 @@ async def create(ctx, time):
             return
         else:
             id = int(server_teams[count - 1].get("id")) + 1 if count > 0 else 1
-            new_team = {"id": id, "time": time, "players": [ctx.author.name]}
+            new_team = {"id": id, "time": time, "players": players}
             server_teams.append(new_team)
     else:
         id = 1
-        new_team = {"id": 1, "time": time, "players": [ctx.author.name]}
+        new_team = {"id": 1, "time": time, "players": players}
         data[server_id] = [new_team]
 
     write_json(data)

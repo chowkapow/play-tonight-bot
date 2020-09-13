@@ -19,6 +19,7 @@ help_command = {
     "create_name": "**!create**",
     "create_value": """Create a team with __!create time__
       __!create 8pm__ will create a team with start time 8pm
+      You can add multiple players if you separate the names with spaces, e.g. __!create time playerId1 playerId2__
       Max of 5 teams can be created""",
     "teams_name": "**!teams**",
     "teams_value": "Show current teams",
