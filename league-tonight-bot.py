@@ -37,6 +37,9 @@ async def help(ctx):
         name=hc.get("leave_name"), value=hc.get("leave_value"), inline=False
     )
     embed.add_field(name=hc.get("add_name"), value=hc.get("add_value"), inline=False)
+    embed.add_field(
+        name=hc.get("remove_name"), value=hc.get("remove_value"), inline=False
+    )
     embed.add_field(name=hc.get("edit_name"), value=hc.get("edit_value"), inline=False)
     embed.set_footer(text=hc.get("footer"))
     await ctx.send(embed=embed)
@@ -159,6 +162,43 @@ async def add(ctx, id, *args):
                     await ctx.send(
                         "{} have been added to team {}.".format(
                             ", ".join(new_players), id
+                        )
+                    )
+                    await teams(ctx)
+                return
+        await ctx.send(em.get("not_found"))
+    else:
+        await ctx.send(em.get("no_teams"))
+
+
+@bot.command()
+async def remove(ctx, id, *args):
+    server_id = str(ctx.message.guild.id)
+    data = read_json("teams.json")
+    if server_id in data and len(data[server_id]) > 0:
+        for t in data[server_id]:
+            if str(t.get("id")) == id:
+                players = t.get("players")
+                if ctx.author.name not in players:
+                    await ctx.send(em.get("not_part"))
+                elif len(args) != len(set(args)):
+                    await ctx.send(em.get("duplicates"))
+                elif len(players) - len(args) < 0:
+                    await ctx.send(em.get("too_many"))
+                else:
+                    removed_players = []
+                    for p in args:
+                        if p in players:
+                            players.remove(p)
+                            removed_players.append(p)
+                        else:
+                            await ctx.send("{} is not part of the team!".format(p))
+                    if len(players) == 0:
+                        data[server_id].remove(t)
+                    write_json(data)
+                    await ctx.send(
+                        "{} have been removed from team {}.".format(
+                            ", ".join(removed_players), id
                         )
                     )
                     await teams(ctx)
