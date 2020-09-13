@@ -8,7 +8,7 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 from constants import error_messages as em, help_command as hc
-from utils import read_json, write_json
+from utils import embed_team, read_json, write_json
 
 load_dotenv()
 env = "prod" if len(sys.argv) == 1 else "dev"
@@ -61,11 +61,12 @@ async def create(ctx, time):
             server_teams.append(new_team)
     else:
         id = 1
-        data[server_id] = [{"id": 1, "time": time, "players": [ctx.author.name]}]
+        new_team = {"id": 1, "time": time, "players": [ctx.author.name]}
+        data[server_id] = [new_team]
 
     write_json(data)
     await ctx.send("Created team {}.".format(id))
-    await teams(ctx)
+    await ctx.send(embed=embed_team(new_team))
 
 
 @bot.command()
@@ -105,7 +106,7 @@ async def join(ctx, id):
                     return
                 t.get("players").append(ctx.author.name)
                 write_json(data)
-                await teams(ctx)
+                await ctx.send(embed=embed_team(t))
                 return
         await ctx.send(em.get("not_found"))
     else:
@@ -125,9 +126,11 @@ async def leave(ctx, id):
                     t.get("players").remove(ctx.author.name)
                     if len(t.get("players")) == 0:
                         data[server_id].remove(t)
+                        await ctx.send("All players removed from team {}.".format(id))
+                    else:
+                        await ctx.send("You have been removed from team {}.".format(id))
+                        await ctx.send(embed=embed_team(t))
                     write_json(data)
-                    await ctx.send("You have been removed from team {}.".format(id))
-                    await teams(ctx)
                 return
         await ctx.send(em.get("not_found"))
     else:
@@ -164,7 +167,7 @@ async def add(ctx, id, *args):
                             ", ".join(new_players), id
                         )
                     )
-                    await teams(ctx)
+                    await ctx.send(embed=embed_team(t))
                 return
         await ctx.send(em.get("not_found"))
     else:
@@ -195,13 +198,15 @@ async def remove(ctx, id, *args):
                             await ctx.send("{} is not part of the team!".format(p))
                     if len(players) == 0:
                         data[server_id].remove(t)
-                    write_json(data)
-                    await ctx.send(
-                        "{} have been removed from team {}.".format(
-                            ", ".join(removed_players), id
+                        await ctx.send("All players removed from team {}.".format(id))
+                    else:
+                        await ctx.send(
+                            "{} have been removed from team {}.".format(
+                                ", ".join(removed_players), id
+                            )
                         )
-                    )
-                    await teams(ctx)
+                        await ctx.send(embed=embed_team(t))
+                    write_json(data)
                 return
         await ctx.send(em.get("not_found"))
     else:
@@ -220,8 +225,8 @@ async def edit(ctx, id, time):
                     return
                 t.update({"time": time})
                 write_json(data)
-                await ctx.send("Team {}'s start time changed to {}".format(id, time))
-                await teams(ctx)
+                await ctx.send("Team {}'s start time changed to {}.".format(id, time))
+                await ctx.send(embed=embed_team(t))
                 return
         await ctx.send(em.get("not_found"))
     else:
