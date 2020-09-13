@@ -36,13 +36,14 @@ async def help(ctx):
     embed.add_field(
         name=hc.get("leave_name"), value=hc.get("leave_value"), inline=False
     )
+    embed.add_field(name=hc.get("add_name"), value=hc.get("add_value"), inline=False)
     embed.add_field(name=hc.get("edit_name"), value=hc.get("edit_value"), inline=False)
     embed.set_footer(text=hc.get("footer"))
     await ctx.send(embed=embed)
 
 
 @bot.command()
-async def create(ctx, time="7pm"):
+async def create(ctx, time):
     server_id = str(ctx.message.guild.id)
     data = read_json("teams.json")
     if server_id in data:
@@ -123,6 +124,43 @@ async def leave(ctx, id):
                         data[server_id].remove(t)
                     write_json(data)
                     await ctx.send("You have been removed from team {}.".format(id))
+                    await teams(ctx)
+                return
+        await ctx.send(em.get("not_found"))
+    else:
+        await ctx.send(em.get("no_teams"))
+
+
+@bot.command()
+async def add(ctx, id, *args):
+    server_id = str(ctx.message.guild.id)
+    data = read_json("teams.json")
+    if server_id in data and len(data[server_id]) > 0:
+        for t in data[server_id]:
+            if str(t.get("id")) == id:
+                players = t.get("players")
+                if ctx.author.name not in players:
+                    await ctx.send(em.get("not_part"))
+                elif len(players) == 5:
+                    await ctx.send(em.get("full"))
+                elif len(args) != len(set(args)):
+                    await ctx.send(em.get("duplicates"))
+                elif len(args) + len(players) > 5:
+                    await ctx.send(em.get("too_many"))
+                else:
+                    new_players = []
+                    for p in args:
+                        if p not in players:
+                            players.append(p)
+                            new_players.append(p)
+                        else:
+                            await ctx.send("{} is already part of the team!".format(p))
+                    write_json(data)
+                    await ctx.send(
+                        "{} have been added to team {}.".format(
+                            ", ".join(new_players), id
+                        )
+                    )
                     await teams(ctx)
                 return
         await ctx.send(em.get("not_found"))
