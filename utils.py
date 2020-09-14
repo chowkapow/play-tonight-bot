@@ -1,9 +1,12 @@
 import discord
 import json
 
+from constants import game_format
+
 
 def embed_team(team):
     id = team.get("id")
+    game = team.get("game")
     time = team.get("time")
     players = team.get("players")
     embed = discord.Embed(title="Team {}".format(id), color=discord.Colour.dark_blue())
@@ -12,7 +15,11 @@ def embed_team(team):
     for p in players:
         result += "{}. {}\n".format(i, p)
         i += 1
-    embed.add_field(name="Time: " + time, value=result, inline=False)
+    embed.add_field(
+        name="{}\nTime: {}".format(game_format.get(game), time),
+        value=result,
+        inline=False,
+    )
     return embed
 
 

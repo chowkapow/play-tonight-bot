@@ -3,11 +3,11 @@ import discord
 import os
 import sys
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
-from constants import error_messages as em, help_command as hc
+from constants import error_messages as em, game_format, help_command as hc, max_players
 from utils import embed_team, read_json, write_json
 
 load_dotenv()
@@ -46,13 +46,16 @@ async def help(ctx):
 
 
 @bot.command()
-async def create(ctx, time, *args):
+async def create(ctx, game, time, *args):
     server_id = str(ctx.message.guild.id)
     data = read_json("teams.json")
     if len(args) != len(set(args)):
         await ctx.send(em.get("duplicates"))
         return
-    elif len(args) >= 5:
+    elif game not in game_format:
+        await ctx.send(em.get("game"))
+        return
+    elif len(args) >= max_players.get(game):
         await ctx.send(em.get("too_many"))
         return
     players = [ctx.author.name]
@@ -62,16 +65,12 @@ async def create(ctx, time, *args):
     if server_id in data:
         server_teams = data.get(server_id)
         count = len(server_teams)
-        if count == 5:
-            await ctx.send(em.get("max_teams"))
-            return
-        else:
-            id = int(server_teams[count - 1].get("id")) + 1 if count > 0 else 1
-            new_team = {"id": id, "time": time, "players": players}
-            server_teams.append(new_team)
+        id = int(server_teams[count - 1].get("id")) + 1 if count > 0 else 1
+        new_team = {"id": id, "game": game, "time": time, "players": players}
+        server_teams.append(new_team)
     else:
         id = 1
-        new_team = {"id": 1, "time": time, "players": players}
+        new_team = {"id": 1, "game": game, "time": time, "players": players}
         data[server_id] = [new_team]
 
     write_json(data)
@@ -84,7 +83,10 @@ async def teams(ctx):
     server_id = str(ctx.message.guild.id)
     data = read_json("teams.json")
     if server_id in data and len(data[server_id]) > 0:
-        embed = discord.Embed(title="Teams", color=discord.Colour.dark_blue())
+        embed = discord.Embed(
+            title="Teams " + date.today().strftime("%b %d"),
+            color=discord.Colour.dark_blue(),
+        )
         for t in data[server_id]:
             i = 1
             players = "\n"
@@ -92,8 +94,10 @@ async def teams(ctx):
                 players += "{}. {}\n".format(i, p)
                 i += 1
             embed.add_field(
-                name="Team " + str(t.get("id")),
-                value="Time: " + t.get("time") + players + "--------------------",
+                name="Team {}\n{}\nTime: {}".format(
+                    str(t.get("id")), game_format.get(t.get("game")), t.get("time")
+                ),
+                value=players + "--------------------",
                 inline=False,
             )
         await ctx.send(embed=embed)
@@ -111,7 +115,7 @@ async def join(ctx, id):
                 if ctx.author.name in t.get("players"):
                     await ctx.send(em.get("join_already"))
                     return
-                if len(t.get("players")) >= 5:
+                if len(t.get("players")) >= max_players.get(t.get("game")):
                     await ctx.send(em.get("full"))
                     return
                 t.get("players").append(ctx.author.name)
@@ -157,11 +161,11 @@ async def add(ctx, id, *args):
                 players = t.get("players")
                 if ctx.author.name not in players:
                     await ctx.send(em.get("not_part"))
-                elif len(players) == 5:
+                elif len(players) == max_players.get(t.get("game")):
                     await ctx.send(em.get("full"))
                 elif len(args) != len(set(args)):
                     await ctx.send(em.get("duplicates"))
-                elif len(args) + len(players) > 5:
+                elif len(args) + len(players) > max_players.get(t.get("game")):
                     await ctx.send(em.get("too_many"))
                 else:
                     new_players = []

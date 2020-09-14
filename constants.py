@@ -1,17 +1,25 @@
 error_messages = {
     "duplicates": "Please do not list a player more than once!",
     "full": "Team is full!",
+    "game": "Please select a game from the FAQ!",
     "join_already": "You are already part of this team!",
-    "max_teams": "Max of 5 teams reached! Please try again later.",
     "no_teams": "No teams exist!",
     "not_found": "Team not found!",
     "not_part": "You are not part of this team!",
     "too_many": "Too many players listed!",
 }
 
+game_format = {
+    "au": "Among Us",
+    "amongus": "Among Us",
+    "apex": "Apex Legends",
+    "league": "League of Legends",
+    "lol": "League of Legends",
+}
+
 help_command = {
     "title": "Help Menu",
-    "description": "Schedule time to play League!\nWant to contribute? [Github](https://github.com/chowkapow/league-tonight-bot)",
+    "description": "Schedule time to play!\nWant to contribute? [Github](https://github.com/chowkapow/play-tonight-bot)",
     "help_name": "**!help**",
     "help_value": "List commands",
     "faq_name": "**!faq**",
@@ -41,3 +49,5 @@ help_command = {
       You must be part of the team to edit the time""",
     "footer": "Feedback and bug reports welcome. Contact chowkapow#4085",
 }
+
+max_players = {"au": 10, "amongus": 10, "apex": 3, "league": 5, "lol": 5}

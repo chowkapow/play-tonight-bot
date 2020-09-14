@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "league-tonight-bot"
+name = "play-tonight-bot"
 version = "0.1.0"
-description = "Discord bot for LoL team formation"
+description = "Discord bot for scheduling time to play games"
 authors = ["Eric Chow <eric.zjp.chow@gmail.com>"]
 
 [tool.poetry.dependencies]
