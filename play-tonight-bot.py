@@ -52,16 +52,16 @@ async def help(ctx):
 @bot.command()
 async def create(ctx, game, time, *args):
     if game not in game_format:
-        await ctx.send(em.get("game"))
+        await ctx.send(em.get("select_game"))
         return
     elif not (pattern.match(time) or pattern_minutes.match(time)):
         await ctx.send(em.get("time"))
         return
     elif len(args) != len(set(args)):
-        await ctx.send(em.get("duplicates"))
+        await ctx.send(em.get("duplicate_player"))
         return
     elif len(args) >= max_players.get(game):
-        await ctx.send(em.get("too_many"))
+        await ctx.send(em.get("too_many_players"))
         return
     server_id = str(ctx.message.guild.id)
     data = read_json("teams.json")
@@ -120,16 +120,16 @@ async def join(ctx, id):
         for t in data[server_id]:
             if str(t.get("id")) == id:
                 if ctx.author.name in t.get("players"):
-                    await ctx.send(em.get("join_already"))
+                    await ctx.send(em.get("existing_member"))
                     return
                 if len(t.get("players")) >= max_players.get(t.get("game")):
-                    await ctx.send(em.get("full"))
+                    await ctx.send(em.get("team_full"))
                     return
                 t.get("players").append(ctx.author.name)
                 write_json(data)
                 await ctx.send(embed=embed_team(t))
                 return
-        await ctx.send(em.get("not_found"))
+        await ctx.send(em.get("team_not_found"))
     else:
         await ctx.send(em.get("no_teams"))
 
@@ -142,7 +142,7 @@ async def leave(ctx, id):
         for t in data[server_id]:
             if str(t.get("id")) == id:
                 if ctx.author.name not in t.get("players"):
-                    await ctx.send(em.get("not_part"))
+                    await ctx.send(em.get("non_member"))
                 else:
                     t.get("players").remove(ctx.author.name)
                     if len(t.get("players")) == 0:
@@ -153,7 +153,7 @@ async def leave(ctx, id):
                         await ctx.send(embed=embed_team(t))
                     write_json(data)
                 return
-        await ctx.send(em.get("not_found"))
+        await ctx.send(em.get("team_not_found"))
     else:
         await ctx.send(em.get("no_teams"))
 
@@ -167,13 +167,13 @@ async def add(ctx, id, *args):
             if str(t.get("id")) == id:
                 players = t.get("players")
                 if ctx.author.name not in players:
-                    await ctx.send(em.get("not_part"))
+                    await ctx.send(em.get("non_member"))
                 elif len(players) == max_players.get(t.get("game")):
-                    await ctx.send(em.get("full"))
+                    await ctx.send(em.get("team_full"))
                 elif len(args) != len(set(args)):
-                    await ctx.send(em.get("duplicates"))
+                    await ctx.send(em.get("duplicate_player"))
                 elif len(args) + len(players) > max_players.get(t.get("game")):
-                    await ctx.send(em.get("too_many"))
+                    await ctx.send(em.get("too_many_players"))
                 else:
                     new_players = []
                     for p in args:
@@ -190,7 +190,7 @@ async def add(ctx, id, *args):
                     )
                     await ctx.send(embed=embed_team(t))
                 return
-        await ctx.send(em.get("not_found"))
+        await ctx.send(em.get("team_not_found"))
     else:
         await ctx.send(em.get("no_teams"))
 
@@ -204,11 +204,11 @@ async def remove(ctx, id, *args):
             if str(t.get("id")) == id:
                 players = t.get("players")
                 if ctx.author.name not in players:
-                    await ctx.send(em.get("not_part"))
+                    await ctx.send(em.get("non_member"))
                 elif len(args) != len(set(args)):
-                    await ctx.send(em.get("duplicates"))
+                    await ctx.send(em.get("duplicate_player"))
                 elif len(players) - len(args) < 0:
-                    await ctx.send(em.get("too_many"))
+                    await ctx.send(em.get("too_many_players"))
                 else:
                     removed_players = []
                     for p in args:
@@ -229,7 +229,7 @@ async def remove(ctx, id, *args):
                         await ctx.send(embed=embed_team(t))
                     write_json(data)
                 return
-        await ctx.send(em.get("not_found"))
+        await ctx.send(em.get("team_not_found"))
     else:
         await ctx.send(em.get("no_teams"))
 
@@ -245,14 +245,14 @@ async def edit(ctx, id, time):
         for t in data[server_id]:
             if str(t.get("id")) == id:
                 if ctx.author.name not in t.get("players"):
-                    await ctx.send(em.get("not_part"))
+                    await ctx.send(em.get("non_member"))
                     return
                 t.update({"time": time})
                 write_json(data)
                 await ctx.send("Team {}'s start time changed to {}.".format(id, time))
                 await ctx.send(embed=embed_team(t))
                 return
-        await ctx.send(em.get("not_found"))
+        await ctx.send(em.get("team_not_found"))
     else:
         await ctx.send(em.get("no_teams"))
 

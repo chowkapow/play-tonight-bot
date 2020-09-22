@@ -1,13 +1,13 @@
 error_messages = {
-    "duplicates": "Please do not list a player more than once!",
-    "full": "Team is full!",
-    "game": "Please select a game from the FAQ!",
-    "join_already": "You are already part of this team!",
+    "duplicate_player": "Please do not list a player more than once!",
+    "existing_member": "You are already part of this team!",
     "no_teams": "No teams exist!",
-    "not_found": "Team not found!",
-    "not_part": "You are not part of this team!",
+    "non_member": "You are not part of this team!",
+    "select_game": "Please select a game from the FAQ!",
+    "team_full": "Team is full!",
+    "team_not_found": "Team not found!",
     "time": "Please enter a valid time!",
-    "too_many": "Too many players listed!",
+    "too_many_players": "Too many players listed!",
 }
 
 game_format = {
