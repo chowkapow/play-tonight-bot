@@ -20,7 +20,7 @@ faq_message = {
         available_games
     ),
     "3. How do I enter the time?": "Please enter the time as Xam, X:XXam, XX:XXam (or pm). No space between the time and period.",
-    "4. Want to add more games?": "Contact chowkapow#4085",
+    "4. Want to add more games to the list?": "Contact chowkapow#4085",
 }
 
 game_format = {
@@ -37,30 +37,34 @@ help_command = {
     "help_name": "**!help**",
     "help_value": "List commands",
     "faq_name": "**!faq**",
-    "faq_value": "Setup and learn how to use this bot",
+    "faq_value": "Learn how to use this bot and what games are supported",
     "create_name": "**!create**",
-    "create_value": """Create a team with __!create time__
-      __!create 8pm__ will create a team with start time 8pm
-      You can add multiple players if you separate the names with spaces, e.g. __!create time playerId1 playerId2__
-      Max of 5 teams can be created""",
+    "create_value": """Create a team with __!create game time__
+      __!create lol 8pm__ will create a League of Legends team with start time 8pm
+      You can add multiple players if you separate the names with spaces, e.g. __!create game time playerId1 playerId2__
+      If the name contains a space surround it with quotes, e.g. __!add n "player id__"
+      See __!faq__ for list of games""",
     "teams_name": "**!teams**",
-    "teams_value": "Show current teams",
+    "teams_value": """Show current teams
+    You can filter teams by game using __!teams game__
+    See __!faq__ for list of games""",
     "join_name": "**!join**",
     "join_value": "Join team with __!join n__, where n is team number",
     "leave_name": "**!leave**",
-    "leave_value": "Leave team with __!leave n__, where n is team number",
+    "leave_value": """Leave team with __!leave n__, where n is team number
+    Team will be deleted if there are no more players""",
     "add_name": "**!add**",
     "add_value": """Add a player with __!add n playerId__, where n is team number
       You can add multiple players if you separate the names with spaces, e.g. __!add n playerId1 playerId2__
-      If the name contains a space, surround it with quotes, e.g. __!add n "player id__\"""",
+      If the name contains a space surround it with quotes, e.g. __!add n "player id__\"""",
     "remove_name": "**!remove**",
     "remove_value": """Remove a player with __!remove n playerId__, where n is team number
       You can remove multiple players if you separate the names with spaces, e.g. __!remove n playerId1 playerId2__
-      If the name contains a space, surround it with quotes, e.g. __!remove n "player id__\"""",
+      If the name contains a space surround it with quotes, e.g. __!remove n "player id__\"""",
     "edit_name": "**!edit**",
     "edit_value": """Edit time to play with __!edit n time__, where n is team number
       __!edit 2 9pm__ will change Team 2's start time to 9pm
-      You must be part of the team to edit the time""",
+      You must be a member of the team to edit the time""",
     "footer": "Feedback and bug reports welcome. Contact chowkapow#4085",
 }
 
