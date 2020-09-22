@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import os
+import re
 import sys
 
 from datetime import date, datetime, timedelta
@@ -15,6 +16,9 @@ env = "prod" if len(sys.argv) == 1 else "dev"
 TOKEN = os.getenv("DISCORD_TOKEN") if env == "prod" else os.getenv("dev_DISCORD_TOKEN")
 
 bot = commands.Bot(command_prefix="!", help_command=None)
+
+pattern = re.compile("([0-9]|0[0-9]|1[0-9]|2[0-3])\s*([AaPp][Mm])")
+pattern_minutes = re.compile("([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])\s*([AaPp][Mm])")
 
 
 @bot.command()
@@ -47,17 +51,20 @@ async def help(ctx):
 
 @bot.command()
 async def create(ctx, game, time, *args):
-    server_id = str(ctx.message.guild.id)
-    data = read_json("teams.json")
-    if len(args) != len(set(args)):
-        await ctx.send(em.get("duplicates"))
-        return
-    elif game not in game_format:
+    if game not in game_format:
         await ctx.send(em.get("game"))
+        return
+    elif not (pattern.match(time) or pattern_minutes.match(time)):
+        await ctx.send(em.get("time"))
+        return
+    elif len(args) != len(set(args)):
+        await ctx.send(em.get("duplicates"))
         return
     elif len(args) >= max_players.get(game):
         await ctx.send(em.get("too_many"))
         return
+    server_id = str(ctx.message.guild.id)
+    data = read_json("teams.json")
     players = [ctx.author.name]
     if len(args) > 0:
         for p in args:
@@ -229,6 +236,9 @@ async def remove(ctx, id, *args):
 
 @bot.command()
 async def edit(ctx, id, time):
+    if not (pattern.match(time) or pattern_minutes.match(time)):
+        await ctx.send(em.get("time"))
+        return
     server_id = str(ctx.message.guild.id)
     data = read_json("teams.json")
     if server_id in data and len(data[server_id]) > 0:

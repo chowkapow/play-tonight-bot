@@ -6,6 +6,7 @@ error_messages = {
     "no_teams": "No teams exist!",
     "not_found": "Team not found!",
     "not_part": "You are not part of this team!",
+    "time": "Please enter a valid time!",
     "too_many": "Too many players listed!",
 }
 
