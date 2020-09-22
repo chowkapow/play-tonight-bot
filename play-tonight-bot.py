@@ -86,26 +86,36 @@ async def create(ctx, game, time, *args):
 
 
 @bot.command()
-async def teams(ctx):
+async def teams(ctx, game=""):
+    if game != "" and game not in game_format:
+        await ctx.send(em.get("select_game"))
+        return
     server_id = str(ctx.message.guild.id)
     data = read_json("teams.json")
     if server_id in data and len(data[server_id]) > 0:
-        embed = discord.Embed(
-            title="Teams " + date.today().strftime("%b %d"),
-            color=discord.Colour.dark_blue(),
+        teams_title = (
+            "Teams " + date.today().strftime("%b %d")
+            if game == ""
+            else game_format.get(game) + " Teams\n" + date.today().strftime("%b %d")
         )
+        embed = discord.Embed(title=teams_title, color=discord.Colour.dark_blue())
         for t in data[server_id]:
+            if game != "" and t.get("game") != game:
+                continue
             i = 1
             players = "\n"
             for p in t.get("players"):
                 players += "{}. {}\n".format(i, p)
                 i += 1
-            embed.add_field(
-                name="Team {}\n{}\nTime: {}".format(
+            team_name = (
+                "Team {}\n{}\nTime: {}".format(
                     str(t.get("id")), game_format.get(t.get("game")), t.get("time")
-                ),
-                value=players + "--------------------",
-                inline=False,
+                )
+                if game == ""
+                else "Team {}\nTime: {}".format(str(t.get("id")), t.get("time"))
+            )
+            embed.add_field(
+                name=team_name, value=players + "--------------------", inline=False
             )
         await ctx.send(embed=embed)
     else:
