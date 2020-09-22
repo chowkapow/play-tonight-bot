@@ -8,7 +8,13 @@ from datetime import date, datetime, timedelta
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
-from constants import error_messages as em, game_format, help_command as hc, max_players
+from constants import (
+    faq_message,
+    error_messages as em,
+    game_format,
+    help_command as hc,
+    max_players,
+)
 from utils import embed_team, read_json, write_json
 
 load_dotenv()
@@ -46,6 +52,14 @@ async def help(ctx):
     )
     embed.add_field(name=hc.get("edit_name"), value=hc.get("edit_value"), inline=False)
     embed.set_footer(text=hc.get("footer"))
+    await ctx.send(embed=embed)
+
+
+@bot.command()
+async def faq(ctx):
+    embed = discord.Embed(title="FAQ", color=discord.Colour.dark_blue())
+    for key, val in faq_message.items():
+        embed.add_field(name=key, value=val, inline=False)
     await ctx.send(embed=embed)
 
 

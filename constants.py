@@ -1,3 +1,7 @@
+available_games = (
+    "Among Us [amongus, au], Apex Legends [apex], League of Legends [league, lol]"
+)
+
 error_messages = {
     "duplicate_player": "Please do not list a player more than once!",
     "existing_member": "You are already part of this team!",
@@ -10,9 +14,18 @@ error_messages = {
     "too_many_players": "Too many players listed!",
 }
 
+faq_message = {
+    "1. How does this bot help me?": "This bot helps you schedule times with friends to play your favorite games. Create a team or join an existing one!",
+    "2. What games does this bot support?": "Currently this bot supports {} (use the formats specified in the [] when creating a team).".format(
+        available_games
+    ),
+    "3. How do I enter the time?": "Please enter the time as Xam, X:XXam, XX:XXam (or pm). No space between the time and period.",
+    "4. Want to add more games?": "Contact chowkapow#4085",
+}
+
 game_format = {
-    "au": "Among Us",
     "amongus": "Among Us",
+    "au": "Among Us",
     "apex": "Apex Legends",
     "league": "League of Legends",
     "lol": "League of Legends",
@@ -51,4 +64,4 @@ help_command = {
     "footer": "Feedback and bug reports welcome. Contact chowkapow#4085",
 }
 
-max_players = {"au": 10, "amongus": 10, "apex": 3, "league": 5, "lol": 5}
+max_players = {"amongus": 10, "au": 10, "apex": 3, "league": 5, "lol": 5}
