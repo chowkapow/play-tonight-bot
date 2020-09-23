@@ -51,6 +51,9 @@ async def help(ctx):
         name=hc.get("remove_name"), value=hc.get("remove_value"), inline=False
     )
     embed.add_field(name=hc.get("edit_name"), value=hc.get("edit_value"), inline=False)
+    embed.add_field(
+        name=hc.get("delete_name"), value=hc.get("delete_value"), inline=False
+    )
     embed.set_footer(text=hc.get("footer"))
     await ctx.send(embed=embed)
 
@@ -275,6 +278,28 @@ async def edit(ctx, id, time):
                 write_json(data)
                 await ctx.send("Team {}'s start time changed to {}.".format(id, time))
                 await ctx.send(embed=embed_team(t))
+                return
+        await ctx.send(em.get("team_not_found"))
+    else:
+        await ctx.send(em.get("no_teams"))
+
+
+@bot.command()
+async def delete(ctx, id):
+    server_id = str(ctx.message.guild.id)
+    data = read_json("teams.json")
+    if server_id in data and len(data[server_id]) > 0:
+        for t in data[server_id]:
+            if str(t.get("id")) == id:
+                if ctx.author.name not in t.get("players"):
+                    await ctx.send(em.get("non_member"))
+                    return
+                elif ctx.author.name != t.get("players")[0]:
+                    await ctx.send(em.get("non_creator"))
+                    return
+                data[server_id].remove(t)
+                write_json(data)
+                await ctx.send("Team {} has been deleted.".format(id))
                 return
         await ctx.send(em.get("team_not_found"))
     else:

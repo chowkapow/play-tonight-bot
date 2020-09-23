@@ -1,11 +1,12 @@
-available_games = (
-    "Among Us [amongus, au], Apex Legends [apex], League of Legends [league, lol]"
-)
+available_games = """Among Us [amongus, au]
+    Apex Legends [apex]
+    League of Legends [league, lol]"""
 
 error_messages = {
     "duplicate_player": "Please do not list a player more than once!",
     "existing_member": "You are already part of this team!",
     "no_teams": "No teams exist!",
+    "non_creator": "You are not Player 1 of this team!",
     "non_member": "You are not part of this team!",
     "select_game": "Please select a game from the FAQ!",
     "team_full": "Team is full!",
@@ -16,11 +17,12 @@ error_messages = {
 
 faq_message = {
     "1. How does this bot help me?": "This bot helps you schedule times with friends to play your favorite games. Create a team or join an existing one!",
-    "2. What games does this bot support?": "Currently this bot supports {} (use the formats specified in the [] when creating a team).".format(
+    "2. What games does this bot support?": "Currently this bot supports:\n\n{}.\n\nPlease use one of the formats specified in the [] when creating a team.".format(
         available_games
     ),
     "3. How do I enter the time?": "Please enter the time as Xam, X:XXam, XX:XXam (or pm). No space between the time and period.",
-    "4. Want to add more games to the list?": "Contact chowkapow#4085",
+    "4. Why is Player 1 able to delete a team?": "Player 1 is generally the creator of the team, so only he/she can delete.",
+    "5. Want to add more games to the list?": "Contact chowkapow#4085",
     "\u200b": "Advanced Commands Usage",
     "Listing multiple players in one command": """You can add multiple players if you separate the names with spaces, e.g. __!create game time playerId1 playerId2__
       If the name contains a space surround it with quotes, e.g. __!add n "player id__
@@ -61,6 +63,9 @@ help_command = {
     "edit_value": """Edit time to play with __!edit n time__, where n is team number
       __!edit 2 9pm__ will change Team 2's start time to 9pm
       You must be a member of the team to edit the time""",
+    "delete_name": "**!delete**",
+    "delete_value": """Delete the entire team with __!delete n__, where n is team number
+      Only Player 1 can delete the team""",
     "footer": "Feedback and bug reports welcome. Contact chowkapow#4085",
 }
 
