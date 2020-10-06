@@ -18,7 +18,7 @@ from constants import (
 from utils import embed_team, read_json, write_json
 
 load_dotenv()
-env = "prod" if len(sys.argv) == 1 else "dev"
+env = "prod" if sys.argv[1] == "prod" else "dev"
 TOKEN = os.getenv("DISCORD_TOKEN") if env == "prod" else os.getenv("dev_DISCORD_TOKEN")
 
 bot = commands.Bot(command_prefix="!", help_command=None)
@@ -81,7 +81,7 @@ async def create(ctx, game, time, *args):
         await ctx.send(em.get("too_many_players"))
         return
     server_id = str(ctx.message.guild.id)
-    data = read_json("teams.json")
+    data = read_json("src/teams.json")
     players = [ctx.author.name]
     if len(args) > 0:
         for p in args:
@@ -108,12 +108,12 @@ async def teams(ctx, game=""):
         await ctx.send(em.get("select_game"))
         return
     server_id = str(ctx.message.guild.id)
-    data = read_json("teams.json")
+    data = read_json("src/teams.json")
     if server_id in data and len(data[server_id]) > 0:
         teams_title = (
-            "Teams " + date.today().strftime("%b %d")
+            "Teams " + date.today().strftime("%b %-d")
             if game == ""
-            else game_format.get(game) + " Teams\n" + date.today().strftime("%b %d")
+            else game_format.get(game) + " Teams\n" + date.today().strftime("%b %-d")
         )
         embed = discord.Embed(title=teams_title, color=discord.Colour.dark_blue())
         for t in data[server_id]:
@@ -142,7 +142,7 @@ async def teams(ctx, game=""):
 @bot.command()
 async def join(ctx, id):
     server_id = str(ctx.message.guild.id)
-    data = read_json("teams.json")
+    data = read_json("src/teams.json")
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:
@@ -164,7 +164,7 @@ async def join(ctx, id):
 @bot.command()
 async def leave(ctx, id):
     server_id = str(ctx.message.guild.id)
-    data = read_json("teams.json")
+    data = read_json("src/teams.json")
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:
@@ -188,7 +188,7 @@ async def leave(ctx, id):
 @bot.command()
 async def add(ctx, id, *args):
     server_id = str(ctx.message.guild.id)
-    data = read_json("teams.json")
+    data = read_json("src/teams.json")
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:
@@ -225,7 +225,7 @@ async def add(ctx, id, *args):
 @bot.command()
 async def remove(ctx, id, *args):
     server_id = str(ctx.message.guild.id)
-    data = read_json("teams.json")
+    data = read_json("src/teams.json")
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:
@@ -267,7 +267,7 @@ async def edit(ctx, id, time):
         await ctx.send(em.get("time"))
         return
     server_id = str(ctx.message.guild.id)
-    data = read_json("teams.json")
+    data = read_json("src/teams.json")
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:
@@ -287,7 +287,7 @@ async def edit(ctx, id, time):
 @bot.command()
 async def delete(ctx, id):
     server_id = str(ctx.message.guild.id)
-    data = read_json("teams.json")
+    data = read_json("src/teams.json")
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:

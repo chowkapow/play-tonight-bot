@@ -30,5 +30,5 @@ def read_json(filename):
 
 
 def write_json(data):
-    with open("teams.json", "w") as outfile:
+    with open("src/teams.json", "w") as outfile:
         json.dump(data, outfile, indent=2)
