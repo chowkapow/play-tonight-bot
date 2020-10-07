@@ -1,7 +1,11 @@
 FROM python:3.8-slim
 
 ENV ENV=dev
+# Enables container logs
 ENV PYTHONUNBUFFERED=1
+# Fix docker build on Raspberry Pi
+ENV MULTIDICT_NO_EXTENSIONS=1
+ENV YARL_NO_EXTENSIONS=1
 
 WORKDIR /bot
 
