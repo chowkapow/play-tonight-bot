@@ -15,7 +15,7 @@ from constants import (
     help_command as hc,
     max_players,
 )
-from utils import embed_team, read_json, write_json
+from utils import embed_team, lowercase_players, read_json, remove_player, write_json
 
 load_dotenv()
 env = "prod" if sys.argv[1] == "prod" else "dev"
@@ -74,7 +74,7 @@ async def create(ctx, game, time, *args):
     elif not (pattern.match(time) or pattern_minutes.match(time)):
         await ctx.send(em.get("time"))
         return
-    elif len(args) != len(set(args)):
+    elif len(args) != len(set(lowercase_players(args))):
         await ctx.send(em.get("duplicate_player"))
         return
     elif len(args) >= max_players.get(game):
@@ -146,7 +146,7 @@ async def join(ctx, id):
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:
-                if ctx.author.name in t.get("players"):
+                if ctx.author.name.lower() in lowercase_players(t.get("players")):
                     await ctx.send(em.get("existing_member"))
                     return
                 if len(t.get("players")) >= max_players.get(t.get("game")):
@@ -168,10 +168,10 @@ async def leave(ctx, id):
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:
-                if ctx.author.name not in t.get("players"):
+                if ctx.author.name.lower() not in lowercase_players(t.get("players")):
                     await ctx.send(em.get("non_member"))
                 else:
-                    t.get("players").remove(ctx.author.name)
+                    remove_player(t.get("players"), ctx.author.name)
                     if len(t.get("players")) == 0:
                         data[server_id].remove(t)
                         await ctx.send("All players removed from team {}.".format(id))
@@ -193,29 +193,33 @@ async def add(ctx, id, *args):
         for t in data[server_id]:
             if str(t.get("id")) == id:
                 players = t.get("players")
-                if ctx.author.name not in players:
+                lc_players = lowercase_players(players)
+                if ctx.author.name.lower() not in lc_players:
                     await ctx.send(em.get("non_member"))
                 elif len(players) == max_players.get(t.get("game")):
                     await ctx.send(em.get("team_full"))
-                elif len(args) != len(set(args)):
+                elif len(args) != len(set(lowercase_players(args))):
                     await ctx.send(em.get("duplicate_player"))
                 elif len(args) + len(players) > max_players.get(t.get("game")):
                     await ctx.send(em.get("too_many_players"))
                 else:
                     new_players = []
                     for p in args:
-                        if p not in players:
+                        if p.lower() not in lc_players:
                             players.append(p)
                             new_players.append(p)
                         else:
                             await ctx.send("{} is already part of the team!".format(p))
                     write_json(data)
-                    await ctx.send(
-                        "{} have been added to team {}.".format(
-                            ", ".join(new_players), id
+                    if len(new_players) > 0:
+                        await ctx.send(
+                            "{} have been added to team {}.".format(
+                                ", ".join(new_players), id
+                            )
+                        ) if len(new_players) > 1 else await ctx.send(
+                            "{} has been added to team {}.".format(new_players[0], id)
                         )
-                    )
-                    await ctx.send(embed=embed_team(t))
+                        await ctx.send(embed=embed_team(t))
                 return
         await ctx.send(em.get("team_not_found"))
     else:
@@ -230,27 +234,32 @@ async def remove(ctx, id, *args):
         for t in data[server_id]:
             if str(t.get("id")) == id:
                 players = t.get("players")
-                if ctx.author.name not in players:
+                lc_players = lowercase_players(players)
+                if ctx.author.name.lower() not in lc_players:
                     await ctx.send(em.get("non_member"))
-                elif len(args) != len(set(args)):
+                elif len(args) != len(set(lowercase_players(args))):
                     await ctx.send(em.get("duplicate_player"))
                 elif len(players) - len(args) < 0:
                     await ctx.send(em.get("too_many_players"))
                 else:
                     removed_players = []
                     for p in args:
-                        if p in players:
-                            players.remove(p)
+                        if p.lower() in lc_players:
+                            remove_player(players, p)
                             removed_players.append(p)
                         else:
                             await ctx.send("{} is not part of the team!".format(p))
                     if len(players) == 0:
                         data[server_id].remove(t)
                         await ctx.send("All players removed from team {}.".format(id))
-                    else:
+                    elif len(removed_players) > 0:
                         await ctx.send(
                             "{} have been removed from team {}.".format(
                                 ", ".join(removed_players), id
+                            )
+                        ) if len(removed_players) > 1 else await ctx.send(
+                            "{} has been removed from team {}.".format(
+                                removed_players[0], id
                             )
                         )
                         await ctx.send(embed=embed_team(t))
@@ -271,7 +280,7 @@ async def edit(ctx, id, time):
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:
-                if ctx.author.name not in t.get("players"):
+                if ctx.author.name.lower() not in lowercase_players(t.get("players")):
                     await ctx.send(em.get("non_member"))
                     return
                 t.update({"time": time})
@@ -291,10 +300,7 @@ async def delete(ctx, id):
     if server_id in data and len(data[server_id]) > 0:
         for t in data[server_id]:
             if str(t.get("id")) == id:
-                if ctx.author.name not in t.get("players"):
-                    await ctx.send(em.get("non_member"))
-                    return
-                elif ctx.author.name != t.get("players")[0]:
+                if ctx.author.name.lower() != t.get("players")[0].lower():
                     await ctx.send(em.get("non_creator"))
                     return
                 data[server_id].remove(t)

@@ -23,10 +23,21 @@ def embed_team(team):
     return embed
 
 
+def lowercase_players(players):
+    return [p.lower() for p in players]
+
+
 def read_json(filename):
     with open(filename) as readfile:
         data = json.load(readfile)
         return data
+
+
+def remove_player(players, player):
+    for p in players:
+        if p.lower() == player.lower():
+            players.remove(p)
+            return players
 
 
 def write_json(data):
