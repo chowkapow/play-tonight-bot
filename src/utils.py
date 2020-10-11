@@ -1,7 +1,23 @@
 import discord
+import inspect
 import json
 
-from constants import game_format
+from constants import game_format, error_messages as em
+
+
+def check_teams(func):
+    async def decorator(ctx, *args, **kwargs):
+        data = read_json("src/teams.json")
+        server_id = str(ctx.message.guild.id)
+        if server_id in data and len(data[server_id]) > 0:
+            await func(ctx, *args, **kwargs)
+        else:
+            await ctx.send(em.get("no_teams"))
+
+    decorator.__name__ = func.__name__
+    decorator.__signature__ = inspect.signature(func)
+
+    return decorator
 
 
 def embed_team(team):
