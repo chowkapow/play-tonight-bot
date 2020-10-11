@@ -1,3 +1,5 @@
+import re
+
 available_games = """Among Us [amongus, au]
 Apex Legends [apex]
 League of Legends [league, lol]"""
@@ -69,3 +71,6 @@ Only Player 1 can delete the team""",
 }
 
 max_players = {"amongus": 10, "au": 10, "apex": 3, "league": 5, "lol": 5}
+
+pattern = re.compile("(1[0-2]|0?[1-9])([AaPp][Mm])")
+pattern_minutes = re.compile("(1[0-2]|0?[1-9]):([0-5][0-9])([AaPp][Mm])")

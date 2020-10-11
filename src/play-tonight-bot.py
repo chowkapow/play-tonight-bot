@@ -1,7 +1,6 @@
 import asyncio
 import discord
 import os
-import re
 import sys
 
 from datetime import date, datetime, timedelta
@@ -14,6 +13,8 @@ from constants import (
     game_format,
     help_command as hc,
     max_players,
+    pattern,
+    pattern_minutes,
 )
 from utils import (
     check_teams,
@@ -29,9 +30,6 @@ env = "prod" if sys.argv[1] == "prod" else "dev"
 TOKEN = os.getenv("DISCORD_TOKEN") if env == "prod" else os.getenv("dev_DISCORD_TOKEN")
 
 bot = commands.Bot(command_prefix="!", help_command=None)
-
-pattern = re.compile("([0-9]|0[0-9]|1[0-9]|2[0-3])\s*([AaPp][Mm])")
-pattern_minutes = re.compile("([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])\s*([AaPp][Mm])")
 
 
 @bot.command()
