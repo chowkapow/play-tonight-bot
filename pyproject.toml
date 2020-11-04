@@ -8,6 +8,7 @@ authors = ["Eric Chow <eric.zjp.chow@gmail.com>"]
 python = "^3.8"
 python-dotenv = "^0.13.0"
 discord = "^1.0.1"
+pytz = "^2020.4"
 
 [tool.poetry.dev-dependencies]
 

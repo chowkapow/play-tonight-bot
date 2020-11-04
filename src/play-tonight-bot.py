@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import os
+import pytz
 import sys
 
 from datetime import date, datetime, timedelta
@@ -310,10 +311,17 @@ async def reset_teams():
 
 @reset_teams.before_loop
 async def before():
-    d = datetime.now()
+    tz = pytz.timezone("America/Chicago")
+    d = datetime.now(tz)
     if d.hour < 3:
         reset = datetime(
-            year=d.year, month=d.month, day=d.day, hour=3, minute=0, second=0
+            year=d.year,
+            month=d.month,
+            day=d.day,
+            hour=3,
+            minute=0,
+            second=0,
+            tzinfo=tz,
         )
     else:
         tomorrow = d + timedelta(days=1)
@@ -324,6 +332,7 @@ async def before():
             hour=3,
             minute=0,
             second=0,
+            tzinfo=tz,
         )
     await asyncio.sleep((reset - d).total_seconds())
     await bot.wait_until_ready()
