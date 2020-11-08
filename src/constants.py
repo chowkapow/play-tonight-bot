@@ -11,6 +11,7 @@ error_messages = {
     "no_teams": "No teams exist!",
     "non_creator": "You are not Player 1 of this team!",
     "non_member": "You are not part of this team!",
+    "permission": "You cannot use this command.",
     "select_game": "Please select a game from the FAQ!",
     "team_full": "Team is full!",
     "team_not_found": "Team not found!",
@@ -82,6 +83,8 @@ max_players = {
     "mc": 20,
     "minecraft": 20,
 }
+
+owners = [126462562744270848, 125675050157211648]
 
 pattern = re.compile(
     "^(1[0-2]|0?[1-9])(:[0-5][0-9])?([AaPp][Mm])?(-(1[0-2]|0?[1-9])(:[0-5][0-9])?([AaPp][Mm])?)?$"

@@ -2,7 +2,20 @@ import discord
 import inspect
 import json
 
-from constants import game_format, error_messages as em
+from constants import game_format, error_messages as em, owners
+
+
+def check_owner(func):
+    async def decorator(ctx, *args, **kwargs):
+        if ctx.author.id in owners:
+            await func(ctx, *args, **kwargs)
+        else:
+            await ctx.send(em.get("permission"))
+
+    decorator.__name__ = func.__name__
+    decorator.__signature__ = inspect.signature(func)
+
+    return decorator
 
 
 def check_teams(func):

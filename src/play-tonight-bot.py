@@ -17,6 +17,7 @@ from constants import (
     pattern,
 )
 from utils import (
+    check_owner,
     check_teams,
     embed_team,
     lowercase_players,
@@ -301,6 +302,26 @@ async def delete(ctx, id):
             await ctx.send("Team {} has been deleted.".format(id))
             return
     await ctx.send(em.get("team_not_found"))
+
+
+@bot.command()
+@check_owner
+@check_teams
+async def destroy(ctx, id=""):
+    server_id = str(ctx.message.guild.id)
+    data = read_json("src/teams.json")
+    if id != "":
+        for t in data[server_id]:
+            if str(t.get("id")) == id:
+                data[server_id].remove(t)
+                write_json(data)
+                await ctx.send("Team {} has been deleted.".format(id))
+                return
+        await ctx.send(em.get("team_not_found"))
+    else:
+        data[server_id] = []
+        write_json(data)
+        await ctx.send("All teams removed.")
 
 
 @tasks.loop(hours=24)
