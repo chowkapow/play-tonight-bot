@@ -15,7 +15,6 @@ from constants import (
     help_command as hc,
     max_players,
     pattern,
-    pattern_minutes,
 )
 from utils import (
     check_teams,
@@ -77,7 +76,7 @@ async def create(ctx, game, time, *args):
     if game not in game_format:
         await ctx.send(em.get("select_game"))
         return
-    elif not (pattern.match(time) or pattern_minutes.match(time)):
+    elif not (pattern.match(time)):
         await ctx.send(em.get("time"))
         return
     elif len(args) != len(set(lowercase_players(args))):
@@ -269,7 +268,7 @@ async def remove(ctx, id, *args):
 @bot.command()
 @check_teams
 async def edit(ctx, id, time):
-    if not (pattern.match(time) or pattern_minutes.match(time)):
+    if not (pattern.match(time)):
         await ctx.send(em.get("time"))
         return
     server_id = str(ctx.message.guild.id)

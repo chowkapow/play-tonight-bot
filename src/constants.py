@@ -23,7 +23,7 @@ faq_message = {
     "2. What games does this bot support?": "Currently this bot supports:\n\n{}\n\nPlease use one of the formats specified in the [] when creating a team.".format(
         available_games
     ),
-    "3. How do I enter the time?": "Please enter the time as Ham / HH:MMam (or pm). No space between the time and period.",
+    "3. How do I enter the time?": "Please enter the time as Ham / HH:MMam (or pm). You can also specify an end time with H-Ham. No space between the time and period.",
     "4. Why is Player 1 able to delete a team?": "Player 1 is generally the creator of the team, so only he/she can delete.",
     "5. Want to add more games to the list?": "Contact chowkapow#4085",
     "\u200b": "Advanced Commands Usage",
@@ -83,5 +83,7 @@ max_players = {
     "minecraft": 20,
 }
 
-pattern = re.compile("(1[0-2]|0?[1-9])([AaPp][Mm])")
-pattern_minutes = re.compile("(1[0-2]|0?[1-9]):([0-5][0-9])([AaPp][Mm])")
+pattern = re.compile(
+    "^(1[0-2]|0?[1-9])(:[0-5][0-9])?([AaPp][Mm])?(-(1[0-2]|0?[1-9])(:[0-5][0-9])?([AaPp][Mm])?)?$"
+)
+
