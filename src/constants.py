@@ -2,7 +2,8 @@ import re
 
 available_games = """Among Us [amongus, au]
 Apex Legends [apex]
-League of Legends [league, lol]"""
+League of Legends [league, lol]
+Minecraft [mc, minecraft]"""
 
 error_messages = {
     "duplicate_player": "Please do not list a player more than once!",
@@ -37,6 +38,8 @@ game_format = {
     "apex": "Apex Legends",
     "league": "League of Legends",
     "lol": "League of Legends",
+    "mc": "Minecraft",
+    "minecraft": "Minecraft",
 }
 
 help_command = {
@@ -70,7 +73,15 @@ Only Player 1 can delete the team""",
     "footer": "Feedback and bug reports welcome. Contact chowkapow#4085",
 }
 
-max_players = {"amongus": 10, "au": 10, "apex": 3, "league": 5, "lol": 5}
+max_players = {
+    "amongus": 20,
+    "au": 20,
+    "apex": 6,
+    "league": 10,
+    "lol": 10,
+    "mc": 20,
+    "minecraft": 20,
+}
 
 pattern = re.compile("(1[0-2]|0?[1-9])([AaPp][Mm])")
 pattern_minutes = re.compile("(1[0-2]|0?[1-9]):([0-5][0-9])([AaPp][Mm])")
