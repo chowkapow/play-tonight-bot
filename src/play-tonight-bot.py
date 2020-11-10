@@ -232,21 +232,22 @@ async def remove(ctx, id, *args):
     for t in data[server_id]:
         if str(t.get("id")) == id:
             players = t.get("players")
-            lc_players = lowercase_players(players)
-            if ctx.author.name.lower() not in lc_players:
+            if ctx.author.name.lower() not in lowercase_players(players):
                 await ctx.send(em.get("non_member"))
-            elif len(args) != len(set(lowercase_players(args))):
+            elif len(args) != len(set(args)):
                 await ctx.send(em.get("duplicate_player"))
-            elif len(players) - len(args) < 0:
-                await ctx.send(em.get("too_many_players"))
             else:
                 removed_players = []
-                for p in args:
-                    if p.lower() in lc_players:
-                        remove_player(players, p)
-                        removed_players.append(p)
+                args = [int(n) - 1 for n in args]
+                for n in args:
+                    if 0 <= n < len(players):
+                        removed_players.append(players[n])
                     else:
-                        await ctx.send("{} is not part of the team!".format(p))
+                        await ctx.send(
+                            "Player {} is not part of the team!".format(n + 1)
+                        )
+                players = [p for n, p in enumerate(players) if n not in args]
+                t["players"] = players
                 if len(players) == 0:
                     data[server_id].remove(t)
                     await ctx.send("All players removed from team {}.".format(id))

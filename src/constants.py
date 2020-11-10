@@ -64,7 +64,7 @@ Team will be deleted if there are no more players""",
     "add_name": "**!add**",
     "add_value": "Add a player with __!add n playerId__, where n is team number",
     "remove_name": "**!remove**",
-    "remove_value": "Remove a player with __!remove n playerId__, where n is team number",
+    "remove_value": "Remove a player with __!remove n playerNumber__, where n is team number",
     "edit_name": "**!edit**",
     "edit_value": """Edit time to play with __!edit n time__, where n is team number
 __!edit 2 9pm__ will change Team 2's start time to 9pm""",
