@@ -106,7 +106,7 @@ async def create(ctx, game, time, *args):
         data[server_id] = [new_team]
 
     write_json(data)
-    await ctx.send("Created team {}.".format(id))
+    await ctx.send("Created Team {}.".format(id))
     await ctx.send(embed=embed_team(new_team))
 
 
@@ -156,7 +156,7 @@ async def join(ctx, *args):
             if str(t.get("id")) == id:
                 found = True
                 if ctx.author.name.lower() in lowercase_players(t.get("players")):
-                    await ctx.send("You are already a part of team {}!".format(id))
+                    await ctx.send("You are already a part of Team {}!".format(id))
                     break
                 if len(t.get("players")) >= max_players.get(t.get("game")):
                     await ctx.send("Team {} is full!".format(id))
@@ -180,14 +180,14 @@ async def leave(ctx, *args):
             if str(t.get("id")) == id:
                 found = True
                 if ctx.author.name.lower() not in lowercase_players(t.get("players")):
-                    await ctx.send("You are not a part of team {}!".format(id))
+                    await ctx.send("You are not a part of Team {}!".format(id))
                 else:
                     remove_player(t.get("players"), ctx.author.name)
                     if len(t.get("players")) == 0:
                         data[server_id].remove(t)
-                        await ctx.send("All players removed from team {}.".format(id))
+                        await ctx.send("All players removed from Team {}.".format(id))
                     else:
-                        await ctx.send("You have been removed from team {}.".format(id))
+                        await ctx.send("You have been removed from Team {}.".format(id))
                         await ctx.send(embed=embed_team(t))
                     write_json(data)
                 break
@@ -223,11 +223,11 @@ async def add(ctx, id, *args):
                 write_json(data)
                 if len(new_players) > 0:
                     await ctx.send(
-                        "{} have been added to team {}.".format(
+                        "{} have been added to Team {}.".format(
                             ", ".join(new_players), id
                         )
                     ) if len(new_players) > 1 else await ctx.send(
-                        "{} has been added to team {}.".format(new_players[0], id)
+                        "{} has been added to Team {}.".format(new_players[0], id)
                     )
                     await ctx.send(embed=embed_team(t))
             return
@@ -260,14 +260,14 @@ async def remove(ctx, id, *args):
                 t["players"] = players
                 if len(players) == 0:
                     data[server_id].remove(t)
-                    await ctx.send("All players removed from team {}.".format(id))
+                    await ctx.send("All players removed from Team {}.".format(id))
                 elif len(removed_players) > 0:
                     await ctx.send(
-                        "{} have been removed from team {}.".format(
+                        "{} have been removed from Team {}.".format(
                             ", ".join(removed_players), id
                         )
                     ) if len(removed_players) > 1 else await ctx.send(
-                        "{} has been removed from team {}.".format(
+                        "{} has been removed from Team {}.".format(
                             removed_players[0], id
                         )
                     )

@@ -23,13 +23,14 @@ faq_message = {
     "2. What games does this bot support?": "Currently this bot supports:\n\n{}\n\nPlease use one of the formats specified in the [] when creating a team.".format(
         available_games
     ),
-    "3. How do I enter the time?": "Please enter the time as Ham / HH:MMam (or pm). You can also specify an end time with H-Ham. No space between the time and period.",
+    "3. How do I enter the time?": "Please enter the time as Ham, HHMMam, or HH:MMam (or pm). You can also specify an end time with H-Ham.",
     "4. Why is Player 1 able to delete a team?": "Player 1 is generally the creator of the team, so only he/she can delete.",
     "5. Want to add more games to the list?": "Contact chowkapow#4085",
     "\u200b": "Advanced Commands Usage",
-    "Listing multiple players in one command": """You can add multiple players if you separate the names with spaces, e.g. __!create game time playerId1 playerId2__
+    "1. Listing multiple players in one command": """You can add multiple players if you separate the names with spaces, e.g. __!create game time playerId1 playerId2__
 If the name contains a space surround it with quotes, e.g. __!create game time "player id__"
-This also applies to __!add__, __!remove__""",
+This also applies to __!add__, __!remove__ (with playerNumbers)""",
+    "2. Joining/leaving multiple teams in one command": """You can join/leave more than one team if you separate the team id's with spaces, e.g. __!join n1 n2__""",
 }
 
 game_format = {
@@ -44,11 +45,11 @@ game_format = {
 
 help_command = {
     "title": "Help Menu",
-    "description": "Schedule time to play games with friends!\nWant to contribute? [Github](https://github.com/chowkapow/play-tonight-bot)\nv1.2.1",
+    "description": "Schedule time to play games with friends!\nWant to contribute? [Github](https://github.com/chowkapow/play-tonight-bot)\nv1.3.0",
     "help_name": "**!help**",
     "help_value": "List commands",
     "faq_name": "**!faq**",
-    "faq_value": "Learn how to use this bot, what games are supported, and advanced commands usage",
+    "faq_value": "Learn how to use this bot, what games are supported, and advanced commands",
     "create_name": "**!create**",
     "create_value": """Create a team with __!create game time__
 __!create lol 8pm__ will create a League of Legends team with start time 8pm""",
@@ -63,10 +64,11 @@ Team will be deleted if there are no more players""",
     "add_name": "**!add**",
     "add_value": "Add a player with __!add n playerId__, where n is team number",
     "remove_name": "**!remove**",
-    "remove_value": "Remove a player with __!remove n playerNumber__, where n is team number",
+    "remove_value": """Remove a player with __!remove n playerNumber__, where n is team number and playerNumber is the player's position in the team
+__!remove 1 2__ will remove Player 2 from Team 1""",
     "edit_name": "**!edit**",
     "edit_value": """Edit time to play with __!edit n time__, where n is team number
-__!edit 2 9pm__ will change Team 2's start time to 9pm""",
+__!edit 2 9pm__ will update Team 2's start time to 9pm""",
     "delete_name": "**!delete**",
     "delete_value": """Delete the entire team with __!delete n__, where n is team number
 Only Player 1 can delete the team""",
