@@ -45,7 +45,7 @@ game_format = {
 
 help_command = {
     "title": "Help Menu",
-    "description": "Schedule time to play games with friends!\nWant to contribute? [Github](https://github.com/chowkapow/play-tonight-bot)",
+    "description": "Schedule time to play games with friends!\nWant to contribute? [Github](https://github.com/chowkapow/play-tonight-bot)\nv1.2.1",
     "help_name": "**!help**",
     "help_value": "List commands",
     "faq_name": "**!faq**",

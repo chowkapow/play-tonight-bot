@@ -4,7 +4,7 @@ import os
 import pytz
 import sys
 
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
@@ -31,6 +31,8 @@ env = "prod" if sys.argv[1] == "prod" else "dev"
 TOKEN = os.getenv("DISCORD_TOKEN") if env == "prod" else os.getenv("dev_DISCORD_TOKEN")
 
 bot = commands.Bot(command_prefix="!", help_command=None)
+
+tz = pytz.timezone("America/Chicago")
 
 
 @bot.command()
@@ -117,9 +119,9 @@ async def teams(ctx, game=""):
     server_id = str(ctx.message.guild.id)
     data = read_json("src/teams.json")
     teams_title = (
-        "Teams " + date.today().strftime("%b %-d")
+        "Teams " + datetime.now(tz).strftime("%b %-d")
         if game == ""
-        else game_format.get(game) + " Teams\n" + date.today().strftime("%b %-d")
+        else game_format.get(game) + " Teams\n" + datetime.now(tz).strftime("%b %-d")
     )
     embed = discord.Embed(title=teams_title, color=discord.Colour.dark_blue())
     for t in data[server_id]:
@@ -332,7 +334,6 @@ async def reset_teams():
 
 @reset_teams.before_loop
 async def before():
-    tz = pytz.timezone("America/Chicago")
     d = datetime.now(tz)
     if d.hour < 3:
         reset = datetime(
