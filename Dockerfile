@@ -1,6 +1,6 @@
 FROM python:3.8-slim
 
-ENV ENV=dev
+ENV ENV=prod
 # Enables container logs
 ENV PYTHONUNBUFFERED=1
 # Fix docker build on Raspberry Pi
