@@ -7,7 +7,6 @@ Minecraft [mc, minecraft]"""
 
 error_messages = {
     "duplicate_player": "Please do not list a player more than once!",
-    "existing_member": "You are already part of this team!",
     "no_teams": "No teams exist!",
     "non_creator": "You are not Player 1 of this team!",
     "non_member": "You are not part of this team!",

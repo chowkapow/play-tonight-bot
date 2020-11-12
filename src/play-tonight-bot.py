@@ -147,44 +147,52 @@ async def teams(ctx, game=""):
 
 @bot.command()
 @check_teams
-async def join(ctx, id):
+async def join(ctx, *args):
     server_id = str(ctx.message.guild.id)
     data = read_json("src/teams.json")
-    for t in data[server_id]:
-        if str(t.get("id")) == id:
-            if ctx.author.name.lower() in lowercase_players(t.get("players")):
-                await ctx.send(em.get("existing_member"))
-                return
-            if len(t.get("players")) >= max_players.get(t.get("game")):
-                await ctx.send(em.get("team_full"))
-                return
-            t.get("players").append(ctx.author.name)
-            write_json(data)
-            await ctx.send(embed=embed_team(t))
-            return
-    await ctx.send(em.get("team_not_found"))
+    for id in args:
+        for t in data[server_id]:
+            found = False
+            if str(t.get("id")) == id:
+                found = True
+                if ctx.author.name.lower() in lowercase_players(t.get("players")):
+                    await ctx.send("You are already a part of team {}!".format(id))
+                    break
+                if len(t.get("players")) >= max_players.get(t.get("game")):
+                    await ctx.send("Team {} is full!".format(id))
+                    break
+                t.get("players").append(ctx.author.name)
+                write_json(data)
+                await ctx.send(embed=embed_team(t))
+                break
+        if not found:
+            await ctx.send(em.get("team_not_found"))
 
 
 @bot.command()
 @check_teams
-async def leave(ctx, id):
+async def leave(ctx, *args):
     server_id = str(ctx.message.guild.id)
     data = read_json("src/teams.json")
-    for t in data[server_id]:
-        if str(t.get("id")) == id:
-            if ctx.author.name.lower() not in lowercase_players(t.get("players")):
-                await ctx.send(em.get("non_member"))
-            else:
-                remove_player(t.get("players"), ctx.author.name)
-                if len(t.get("players")) == 0:
-                    data[server_id].remove(t)
-                    await ctx.send("All players removed from team {}.".format(id))
+    for id in args:
+        for t in data[server_id]:
+            found = False
+            if str(t.get("id")) == id:
+                found = True
+                if ctx.author.name.lower() not in lowercase_players(t.get("players")):
+                    await ctx.send("You are not a part of team {}!".format(id))
                 else:
-                    await ctx.send("You have been removed from team {}.".format(id))
-                    await ctx.send(embed=embed_team(t))
-                write_json(data)
-            return
-    await ctx.send(em.get("team_not_found"))
+                    remove_player(t.get("players"), ctx.author.name)
+                    if len(t.get("players")) == 0:
+                        data[server_id].remove(t)
+                        await ctx.send("All players removed from team {}.".format(id))
+                    else:
+                        await ctx.send("You have been removed from team {}.".format(id))
+                        await ctx.send(embed=embed_team(t))
+                    write_json(data)
+                break
+        if not found:
+            await ctx.send(em.get("team_not_found"))
 
 
 @bot.command()
